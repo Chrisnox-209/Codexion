@@ -1,33 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cpietrza <cpietrza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/09/15 16:24:18 by cpietrza          #+#    #+#             */
-/*   Updated: 2026/09/15 16:27:10 by cpietrza         ###   ########.fr       */
+/*   Created: 2026/09/15 16:24:13 by cpietrza          #+#    #+#             */
+/*   Updated: 2026/09/15 16:25:49 by cpietrza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.h"
-#include <unistd.h>
+#ifndef PARSING_H
+# define PARSING_H
 
-int	main(int argc, char **argv)
+# include <stdlib.h>
+# include <string.h>
+
+typedef struct s_config
 {
-	t_config	config;
+	int	nb_coders;
+	int	t_burnout;
+	int	t_compile;
+	int	t_debug;
+	int	t_refactor;
+	int	nb_compiles;
+	int	cooldown;
+	int	is_edf;
+}		t_config;
 
-	if (argc == 9)
-	{
-		if (parse_arguments(argc, argv, &config) != 0)
-		{
-			write(2, "[ERROR]: Invalid arguments.\n", 28);
-			return (1);
-		}
-	}
-	else
-	{
-		write(2, "[ERROR]: The number of arguments is incorrect.\n", 47);
-	}
-	return (0);
-}
+int		parse_arguments(int argc, char **argv, t_config *config);
+int		is_valid_number(char *str);
+
+#endif
