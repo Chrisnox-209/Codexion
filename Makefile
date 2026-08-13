@@ -1,13 +1,22 @@
 CC = cc
-CFLAGS = -Wall -Werror -Wextra
-FOLDER_SOURCE = src/
-FOLDER_BUILD = .build
-FOLDER_INCLUDE = inc/
+CFLAGS = -Wall -Wextra -Werror -pthread
+CPPFLAGS = -Iinc
+FOLDER_BUILD = .build/
 
-NAME = 
+NAME = codexion
+SOURCES = main.c src/parse.c
+OBJECTS = $(addprefix $(FOLDER_BUILD), $(SOURCES:.c=.o))
+
 .PHONY: all clean fclean re
 
 all: $(NAME)
+
+$(NAME): $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME)
+
+$(FOLDER_BUILD)%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
 	rm -rf $(FOLDER_BUILD)
