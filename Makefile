@@ -4,7 +4,11 @@ CPPFLAGS = -Iinc
 FOLDER_BUILD = .build/
 
 NAME = codexion
-SOURCES = main.c src/parse.c
+SOURCES = main.c \
+		  src/init.c \
+		  src/parse.c \
+		  src/threads.c \
+		  src/time.c
 OBJECTS = $(addprefix $(FOLDER_BUILD), $(SOURCES:.c=.o))
 
 .PHONY: all clean fclean re
