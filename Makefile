@@ -6,7 +6,9 @@ FOLDER_BUILD = .build/
 NAME = codexion
 SOURCES = main.c \
 		  src/init.c \
+		  src/monitor.c \
 		  src/parse.c \
+		  src/sync.c \
 		  src/threads.c \
 		  src/time.c
 OBJECTS = $(addprefix $(FOLDER_BUILD), $(SOURCES:.c=.o))

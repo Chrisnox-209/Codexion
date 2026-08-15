@@ -30,3 +30,12 @@ void	sleep_ms(long duration)
 	while (current_time_ms() < end)
 		usleep(500);
 }
+
+void	simulation_sleep(t_simulation *simulation, long duration)
+{
+	long	end;
+
+	end = current_time_ms() + duration;
+	while (current_time_ms() < end && !simulation_stopped(simulation))
+		usleep(500);
+}
