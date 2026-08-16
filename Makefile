@@ -12,6 +12,7 @@ SOURCES = main.c \
 		  src/threads.c \
 		  src/time.c
 OBJECTS = $(addprefix $(FOLDER_BUILD), $(SOURCES:.c=.o))
+HEADERS = inc/codexion.h inc/parsing.h inc/structures.h
 
 .PHONY: all clean fclean re
 
@@ -20,7 +21,7 @@ all: $(NAME)
 $(NAME): $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME)
 
-$(FOLDER_BUILD)%.o: %.c
+$(FOLDER_BUILD)%.o: %.c $(HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
