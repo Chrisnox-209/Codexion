@@ -6,54 +6,71 @@
 /*   By: cpietrza <cpietrza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/15 16:24:22 by cpietrza          #+#    #+#             */
-/*   Updated: 2026/09/15 16:28:38 by cpietrza         ###   ########.fr       */
+/*   Updated: 2026/08/17 14:10:00 by cpietrza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
+#include <limits.h>
+#include <string.h>
 
-int	is_valid_number(char *str)
+static int	parse_number(char *text, int *number)
 {
-	int	i;
+	long	value;
+	int		digit;
 
-	i = 0;
-	if (str[i] == '+')
-		i++;
-	if (str[i] == '\0')
-		return (0);
-	while (str[i])
+	value = 0;
+	if (*text == '+')
+		text++;
+	if (*text == '\0')
+		return (1);
+	while (*text)
 	{
-		if (str[i] < '0' || str[i] > '9')
-			return (0);
-		i++;
+		if (*text < '0' || *text > '9')
+			return (1);
+		digit = *text - '0';
+		if (value > (INT_MAX - digit) / 10)
+			return (1);
+		value = value * 10 + digit;
+		text++;
 	}
-	return (1);
+	*number = (int)value;
+	return (0);
+}
+
+static int	parse_numbers(char **argv, t_config *config)
+{
+	if (parse_number(argv[1], &config->nb_coders)
+		|| parse_number(argv[2], &config->t_burnout)
+		|| parse_number(argv[3], &config->t_compile)
+		|| parse_number(argv[4], &config->t_debug)
+		|| parse_number(argv[5], &config->t_refactor)
+		|| parse_number(argv[6], &config->nb_compiles)
+		|| parse_number(argv[7], &config->cooldown))
+		return (1);
+	return (0);
+}
+
+static int	parse_scheduler(char *text, t_config *config)
+{
+	if (strcmp(text, "fifo") == 0)
+		config->is_edf = 0;
+	else if (strcmp(text, "edf") == 0)
+		config->is_edf = 1;
+	else
+		return (1);
+	return (0);
 }
 
 int	parse_arguments(int argc, char **argv, t_config *config)
 {
-	int	i;
-
 	if (argc != 9)
 		return (1);
-	i = 0;
-	while (++i <= 7)
-		if (!is_valid_number(argv[i]))
-			return (1);
-	config->nb_coders = atoi(argv[1]);
-	config->t_burnout = atoi(argv[2]);
-	config->t_compile = atoi(argv[3]);
-	config->t_debug = atoi(argv[4]);
-	config->t_refactor = atoi(argv[5]);
-	config->nb_compiles = atoi(argv[6]);
-	config->cooldown = atoi(argv[7]);
-	if (strcmp(argv[8], "fifo") == 0)
-		config->is_edf = 0;
-	else if (strcmp(argv[8], "edf") == 0)
-		config->is_edf = 1;
-	else
+	if (parse_numbers(argv, config))
 		return (1);
-	if (config->nb_coders <= 0)
+	if (parse_scheduler(argv[8], config))
+		return (1);
+	if (config->nb_coders == 0)
 		return (1);
 	return (0);
 }
