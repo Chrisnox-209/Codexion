@@ -6,7 +6,7 @@
 /*   By: cpietrza <cpietrza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/14 10:12:00 by cpietrza          #+#    #+#             */
-/*   Updated: 2026/08/14 10:12:00 by cpietrza         ###   ########.fr       */
+/*   Updated: 2026/08/18 15:18:00 by cpietrza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,50 +14,99 @@
 #include <stdlib.h>
 #include <string.h>
 
-int	init_simulation(t_simulation *simulation, t_config *config)
+static int	allocate_arrays(t_simulation *simulation)
 {
-	int	i;
+	int	size;
 
-	memset(simulation, 0, sizeof(*simulation));
-	simulation->config = *config;
-	simulation->coders = malloc(sizeof(t_coder) * config->nb_coders);
-	simulation->dongles = malloc(sizeof(t_dongle) * config->nb_coders);
+	size = simulation->config.nb_coders;
+	simulation->coders = malloc(sizeof(t_coder) * size);
+	simulation->dongles = malloc(sizeof(t_dongle) * size);
 	if (simulation->coders == NULL || simulation->dongles == NULL)
-		return (1);
-	memset(simulation->coders, 0, sizeof(t_coder) * config->nb_coders);
-	memset(simulation->dongles, 0, sizeof(t_dongle) * config->nb_coders);
-	if (pthread_mutex_init(&simulation->print_mutex, NULL) != 0
-		|| pthread_mutex_init(&simulation->stop_mutex, NULL) != 0)
-		return (1);
-	i = 0;
-	while (i < config->nb_coders)
 	{
-		simulation->dongles[i].id = i;
-		pthread_mutex_init(&simulation->dongles[i].mutex, NULL);
-		pthread_mutex_init(&simulation->coders[i].state_mutex, NULL);
-		simulation->coders[i].id = i + 1;
-		simulation->coders[i].simulation = simulation;
-		simulation->coders[i].left_dongle = &simulation->dongles[i];
-		simulation->coders[i].right_dongle = &simulation->dongles[(i + 1)
-			% config->nb_coders];
-		i++;
+		free(simulation->coders);
+		free(simulation->dongles);
+		return (1);
+	}
+	memset(simulation->coders, 0, sizeof(t_coder) * size);
+	memset(simulation->dongles, 0, sizeof(t_dongle) * size);
+	return (0);
+}
+
+static int	init_main_mutexes(t_simulation *simulation)
+{
+	if (pthread_mutex_init(&simulation->print_mutex, NULL) != 0)
+		return (1);
+	if (pthread_mutex_init(&simulation->stop_mutex, NULL) != 0)
+	{
+		pthread_mutex_destroy(&simulation->print_mutex);
+		return (1);
 	}
 	return (0);
 }
 
-void	destroy_simulation(t_simulation *simulation)
+static int	init_dongles(t_simulation *simulation)
 {
 	int	i;
 
 	i = 0;
 	while (i < simulation->config.nb_coders)
 	{
-		pthread_mutex_destroy(&simulation->coders[i].state_mutex);
-		pthread_mutex_destroy(&simulation->dongles[i].mutex);
+		simulation->dongles[i].id = i;
+		if (pthread_mutex_init(&simulation->dongles[i].mutex, NULL) != 0)
+		{
+			while (--i >= 0)
+				pthread_mutex_destroy(&simulation->dongles[i].mutex);
+			return (1);
+		}
 		i++;
 	}
-	pthread_mutex_destroy(&simulation->print_mutex);
-	pthread_mutex_destroy(&simulation->stop_mutex);
-	free(simulation->coders);
-	free(simulation->dongles);
+	return (0);
+}
+
+static int	init_coders(t_simulation *simulation)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = simulation->config.nb_coders;
+	while (i < count)
+	{
+		if (pthread_mutex_init(&simulation->coders[i].state_mutex, NULL))
+			break ;
+		simulation->coders[i].id = i + 1;
+		simulation->coders[i].simulation = simulation;
+		simulation->coders[i].left_dongle = &simulation->dongles[i];
+		simulation->coders[i].right_dongle = &simulation->dongles[(i + 1)
+			% count];
+		i++;
+	}
+	if (i == count)
+		return (0);
+	while (--i >= 0)
+		pthread_mutex_destroy(&simulation->coders[i].state_mutex);
+	return (1);
+}
+
+int	init_simulation(t_simulation *simulation, t_config *config)
+{
+	memset(simulation, 0, sizeof(*simulation));
+	simulation->config = *config;
+	if (allocate_arrays(simulation))
+		return (1);
+	if (init_main_mutexes(simulation))
+	{
+		free(simulation->coders);
+		free(simulation->dongles);
+		return (1);
+	}
+	if (init_dongles(simulation))
+	{
+		clear_initialization(simulation, 0);
+		return (1);
+	}
+	if (!init_coders(simulation))
+		return (0);
+	clear_initialization(simulation, 1);
+	return (1);
 }

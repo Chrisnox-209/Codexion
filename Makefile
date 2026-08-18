@@ -5,6 +5,7 @@ FOLDER_BUILD = .build/
 
 NAME = codexion
 SOURCES = main.c \
+		  src/cleanup.c \
 		  src/init.c \
 		  src/monitor.c \
 		  src/parse.c \
