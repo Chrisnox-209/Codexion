@@ -6,6 +6,9 @@ FOLDER_BUILD = .build/
 NAME = codexion
 SOURCES = main.c \
 		  src/cleanup.c \
+		  src/heap.c \
+		  src/heap_delete.c \
+		  src/heap_remove.c \
 		  src/init.c \
 		  src/monitor.c \
 		  src/parse.c \
@@ -13,7 +16,7 @@ SOURCES = main.c \
 		  src/threads.c \
 		  src/time.c
 OBJECTS = $(addprefix $(FOLDER_BUILD), $(SOURCES:.c=.o))
-HEADERS = inc/codexion.h inc/parsing.h inc/structures.h
+HEADERS = inc/codexion.h inc/heap.h inc/parsing.h inc/structures.h
 
 .PHONY: all clean fclean re
 

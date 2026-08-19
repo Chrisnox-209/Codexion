@@ -14,6 +14,7 @@
 # define CODEXION_H
 
 # include "structures.h"
+# include "heap.h"
 
 int		init_simulation(t_simulation *simulation, t_config *config);
 int		run_simulation(t_simulation *simulation);

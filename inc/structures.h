@@ -17,6 +17,22 @@
 # include <pthread.h>
 
 typedef struct s_simulation	t_simulation;
+typedef struct s_coder		t_coder;
+
+typedef struct s_request
+{
+	t_coder	*coder;
+	long	order;
+	long	deadline;
+}						t_request;
+
+typedef struct s_heap
+{
+	t_request	**items;
+	int			size;
+	int			capacity;
+	int			is_edf;
+}						t_heap;
 
 typedef struct s_dongle
 {
@@ -24,7 +40,7 @@ typedef struct s_dongle
 	pthread_mutex_t	mutex;
 }						t_dongle;
 
-typedef struct s_coder
+struct s_coder
 {
 	int				id;
 	pthread_t		thread;
@@ -34,7 +50,7 @@ typedef struct s_coder
 	t_dongle		*left_dongle;
 	t_dongle		*right_dongle;
 	t_simulation	*simulation;
-}						t_coder;
+};
 
 struct s_simulation
 {
