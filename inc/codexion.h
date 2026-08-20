@@ -17,9 +17,11 @@
 # include "heap.h"
 
 int		init_simulation(t_simulation *simulation, t_config *config);
+int		init_dongles(t_simulation *simulation);
 int		run_simulation(t_simulation *simulation);
 void	destroy_simulation(t_simulation *simulation);
 void	clear_initialization(t_simulation *simulation, int dongles_ready);
+void	destroy_dongles(t_simulation *simulation, int count);
 void	*coder_routine(void *data);
 void	*monitor_routine(void *data);
 int		simulation_stopped(t_simulation *simulation);

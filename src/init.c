@@ -44,25 +44,6 @@ static int	init_main_mutexes(t_simulation *simulation)
 	return (0);
 }
 
-static int	init_dongles(t_simulation *simulation)
-{
-	int	i;
-
-	i = 0;
-	while (i < simulation->config.nb_coders)
-	{
-		simulation->dongles[i].id = i;
-		if (pthread_mutex_init(&simulation->dongles[i].mutex, NULL) != 0)
-		{
-			while (--i >= 0)
-				pthread_mutex_destroy(&simulation->dongles[i].mutex);
-			return (1);
-		}
-		i++;
-	}
-	return (0);
-}
-
 static int	init_coders(t_simulation *simulation)
 {
 	int	i;

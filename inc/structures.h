@@ -38,6 +38,11 @@ typedef struct s_dongle
 {
 	int				id;
 	pthread_mutex_t	mutex;
+	pthread_cond_t	condition;
+	t_heap			queue;
+	int				owner_id;
+	long			available_at;
+	long			next_order;
 }						t_dongle;
 
 struct s_coder
