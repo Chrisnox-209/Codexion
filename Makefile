@@ -6,6 +6,7 @@ FOLDER_BUILD = .build/
 NAME = codexion
 SOURCES = main.c \
 		  src/cleanup.c \
+		  src/dongle.c \
 		  src/dongle_init.c \
 		  src/heap.c \
 		  src/heap_delete.c \

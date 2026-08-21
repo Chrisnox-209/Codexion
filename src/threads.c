@@ -13,33 +13,10 @@
 #include "codexion.h"
 #include <unistd.h>
 
-static void	lock_dongles(t_coder *coder)
+static int	compile_code(t_coder *coder)
 {
-	t_dongle	*first;
-	t_dongle	*second;
-
-	first = coder->left_dongle;
-	second = coder->right_dongle;
-	if (first->id > second->id)
-	{
-		first = coder->right_dongle;
-		second = coder->left_dongle;
-	}
-	pthread_mutex_lock(&first->mutex);
-	log_state(coder, "has taken a dongle");
-	pthread_mutex_lock(&second->mutex);
-	log_state(coder, "has taken a dongle");
-}
-
-static void	unlock_dongles(t_coder *coder)
-{
-	pthread_mutex_unlock(&coder->left_dongle->mutex);
-	pthread_mutex_unlock(&coder->right_dongle->mutex);
-}
-
-static void	compile_code(t_coder *coder)
-{
-	lock_dongles(coder);
+	if (!take_dongles(coder))
+		return (0);
 	pthread_mutex_lock(&coder->state_mutex);
 	coder->last_compile_ms = current_time_ms();
 	pthread_mutex_unlock(&coder->state_mutex);
@@ -49,16 +26,18 @@ static void	compile_code(t_coder *coder)
 	pthread_mutex_lock(&coder->state_mutex);
 	coder->compile_count++;
 	pthread_mutex_unlock(&coder->state_mutex);
-	unlock_dongles(coder);
+	release_dongle(coder, coder->left_dongle);
+	release_dongle(coder, coder->right_dongle);
+	return (1);
 }
 
 static void	one_coder(t_coder *coder)
 {
-	pthread_mutex_lock(&coder->left_dongle->mutex);
-	log_state(coder, "has taken a dongle");
+	if (!take_one_dongle(coder, coder->left_dongle))
+		return ;
 	while (!simulation_stopped(coder->simulation))
 		usleep(500);
-	pthread_mutex_unlock(&coder->left_dongle->mutex);
+	release_dongle(coder, coder->left_dongle);
 }
 
 void	*coder_routine(void *data)
@@ -76,7 +55,8 @@ void	*coder_routine(void *data)
 			coder->simulation->config.t_compile / 2);
 	while (!simulation_stopped(coder->simulation))
 	{
-		compile_code(coder);
+		if (!compile_code(coder))
+			break ;
 		log_state(coder, "is debugging");
 		simulation_sleep(coder->simulation,
 			coder->simulation->config.t_debug);

@@ -25,8 +25,7 @@ static int	init_one_dongle(t_simulation *simulation, int index)
 		pthread_mutex_destroy(&dongle->mutex);
 		return (1);
 	}
-	if (heap_init(&dongle->queue, simulation->config.nb_coders,
-			simulation->config.is_edf) != 0)
+	if (heap_init(&dongle->queue, simulation->config.nb_coders, 0) != 0)
 	{
 		pthread_cond_destroy(&dongle->condition);
 		pthread_mutex_destroy(&dongle->mutex);
