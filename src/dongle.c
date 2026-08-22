@@ -13,6 +13,17 @@
 #include "codexion.h"
 #include <unistd.h>
 
+static long	coder_deadline(t_coder *coder)
+{
+	long	deadline;
+
+	pthread_mutex_lock(&coder->state_mutex);
+	deadline = coder->last_compile_ms
+		+ coder->simulation->config.t_burnout;
+	pthread_mutex_unlock(&coder->state_mutex);
+	return (deadline);
+}
+
 static int	request_ready(t_dongle *dongle, t_request *request)
 {
 	if (dongle->owner_id != 0)
@@ -29,7 +40,7 @@ int	take_one_dongle(t_coder *coder, t_dongle *dongle)
 
 	acquired = 0;
 	request.coder = coder;
-	request.deadline = 0;
+	request.deadline = coder_deadline(coder);
 	pthread_mutex_lock(&dongle->mutex);
 	request.order = dongle->next_order++;
 	heap_push(&dongle->queue, &request);
