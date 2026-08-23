@@ -39,3 +39,9 @@ void	simulation_sleep(t_simulation *simulation, long duration)
 	while (current_time_ms() < end && !simulation_stopped(simulation))
 		usleep(500);
 }
+
+void	ms_to_timespec(long milliseconds, struct timespec *time)
+{
+	time->tv_sec = milliseconds / 1000;
+	time->tv_nsec = (milliseconds % 1000) * 1000000;
+}

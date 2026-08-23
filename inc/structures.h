@@ -15,6 +15,7 @@
 
 # include "parsing.h"
 # include <pthread.h>
+# include <time.h>
 
 typedef struct s_simulation	t_simulation;
 typedef struct s_coder		t_coder;

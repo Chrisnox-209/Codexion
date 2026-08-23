@@ -26,6 +26,7 @@ void	*coder_routine(void *data);
 void	*monitor_routine(void *data);
 int		simulation_stopped(t_simulation *simulation);
 void	stop_simulation(t_simulation *simulation);
+void	wake_all_dongles(t_simulation *simulation);
 void	log_state(t_coder *coder, char *message);
 void	log_burnout(t_coder *coder);
 int		take_dongles(t_coder *coder);
@@ -34,5 +35,6 @@ void	release_dongle(t_coder *coder, t_dongle *dongle);
 long	current_time_ms(void);
 void	sleep_ms(long duration);
 void	simulation_sleep(t_simulation *simulation, long duration);
+void	ms_to_timespec(long milliseconds, struct timespec *time);
 
 #endif

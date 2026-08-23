@@ -8,6 +8,7 @@ SOURCES = main.c \
 		  src/cleanup.c \
 		  src/dongle.c \
 		  src/dongle_init.c \
+		  src/dongle_wait.c \
 		  src/heap.c \
 		  src/heap_delete.c \
 		  src/heap_remove.c \

@@ -28,6 +28,21 @@ void	stop_simulation(t_simulation *simulation)
 	pthread_mutex_lock(&simulation->stop_mutex);
 	simulation->stopped = 1;
 	pthread_mutex_unlock(&simulation->stop_mutex);
+	wake_all_dongles(simulation);
+}
+
+void	wake_all_dongles(t_simulation *simulation)
+{
+	int	index;
+
+	index = 0;
+	while (index < simulation->config.nb_coders)
+	{
+		pthread_mutex_lock(&simulation->dongles[index].mutex);
+		pthread_cond_broadcast(&simulation->dongles[index].condition);
+		pthread_mutex_unlock(&simulation->dongles[index].mutex);
+		index++;
+	}
 }
 
 void	log_state(t_coder *coder, char *message)
@@ -59,4 +74,5 @@ void	log_burnout(t_coder *coder)
 	}
 	pthread_mutex_unlock(&simulation->stop_mutex);
 	pthread_mutex_unlock(&simulation->print_mutex);
+	wake_all_dongles(simulation);
 }
