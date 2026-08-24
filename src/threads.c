@@ -66,28 +66,3 @@ void	*coder_routine(void *data)
 	}
 	return (NULL);
 }
-
-int	run_simulation(t_simulation *simulation)
-{
-	int	i;
-
-	simulation->start_ms = current_time_ms();
-	i = 0;
-	while (i < simulation->config.nb_coders)
-	{
-		simulation->coders[i].last_compile_ms = simulation->start_ms;
-		if (pthread_create(&simulation->coders[i].thread, NULL,
-				coder_routine, &simulation->coders[i]) != 0)
-			break ;
-		i++;
-	}
-	if (i != simulation->config.nb_coders
-		|| pthread_create(&simulation->monitor, NULL,
-			monitor_routine, simulation) != 0)
-		stop_simulation(simulation);
-	else
-		pthread_join(simulation->monitor, NULL);
-	while (--i >= 0)
-		pthread_join(simulation->coders[i].thread, NULL);
-	return (0);
-}

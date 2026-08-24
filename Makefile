@@ -15,6 +15,7 @@ SOURCES = main.c \
 		  src/init.c \
 		  src/monitor.c \
 		  src/parse.c \
+		  src/run.c \
 		  src/sync.c \
 		  src/threads.c \
 		  src/time.c
