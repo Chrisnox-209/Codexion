@@ -6,54 +6,83 @@
 /*   By: cpietrza <cpietrza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/15 15:05:00 by cpietrza          #+#    #+#             */
-/*   Updated: 2026/08/15 15:05:00 by cpietrza         ###   ########.fr       */
+/*   Updated: 2026/08/25 14:12:00 by cpietrza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 #include <unistd.h>
 
-static int	check_coders(t_simulation *simulation)
+static int	coder_completed(t_coder *coder)
 {
-	int		i;
-	int		completed;
+	int	completed;
+
+	pthread_mutex_lock(&coder->state_mutex);
+	completed = coder->compile_count
+		>= coder->simulation->config.nb_compiles;
+	pthread_mutex_unlock(&coder->state_mutex);
+	return (completed);
+}
+
+static int	all_coders_completed(t_simulation *simulation)
+{
+	int	index;
+
+	index = 0;
+	while (index < simulation->config.nb_coders)
+	{
+		if (!coder_completed(&simulation->coders[index]))
+			return (0);
+		index++;
+	}
+	return (1);
+}
+
+static int	coder_burned_out(t_coder *coder, long now)
+{
 	long	last_compile;
 
-	i = 0;
-	completed = 1;
-	while (i < simulation->config.nb_coders)
+	pthread_mutex_lock(&coder->state_mutex);
+	last_compile = coder->last_compile_ms;
+	pthread_mutex_unlock(&coder->state_mutex);
+	return (now - last_compile >= coder->simulation->config.t_burnout);
+}
+
+static t_coder	*find_burned_out(t_simulation *simulation)
+{
+	int		index;
+	long	now;
+
+	index = 0;
+	now = current_time_ms();
+	while (index < simulation->config.nb_coders)
 	{
-		pthread_mutex_lock(&simulation->coders[i].state_mutex);
-		last_compile = simulation->coders[i].last_compile_ms;
-		if (simulation->coders[i].compile_count
-			< simulation->config.nb_compiles)
-			completed = 0;
-		pthread_mutex_unlock(&simulation->coders[i].state_mutex);
-		if (current_time_ms() - last_compile
-			>= simulation->config.t_burnout)
-		{
-			log_burnout(&simulation->coders[i]);
-			return (1);
-		}
-		i++;
+		if (coder_burned_out(&simulation->coders[index], now))
+			return (&simulation->coders[index]);
+		index++;
 	}
-	if (completed)
-	{
-		stop_simulation(simulation);
-		return (1);
-	}
-	return (0);
+	return (NULL);
 }
 
 void	*monitor_routine(void *data)
 {
 	t_simulation	*simulation;
+	t_coder			*burned_out;
 
 	simulation = (t_simulation *)data;
 	while (!simulation_stopped(simulation))
 	{
-		if (check_coders(simulation))
-			break ;
+		if (all_coders_completed(simulation))
+		{
+			stop_simulation(simulation);
+			return (NULL);
+		}
+		burned_out = find_burned_out(simulation);
+		if (burned_out != NULL)
+		{
+			log_burnout(burned_out);
+			return (NULL);
+		}
 		usleep(500);
 	}
 	return (NULL);
