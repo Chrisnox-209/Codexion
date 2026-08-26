@@ -51,10 +51,29 @@ static void	wait_for_request(t_coder *coder, t_dongle *dongle,
 	}
 }
 
+static int	finish_request(t_coder *coder, t_dongle *dongle,
+		t_request *request)
+{
+	int	acquired;
+
+	acquired = !simulation_stopped(coder->simulation);
+	if (acquired)
+	{
+		heap_pop(&dongle->queue);
+		dongle->owner_id = coder->id;
+	}
+	else
+		heap_remove(&dongle->queue, request);
+	pthread_cond_broadcast(&dongle->condition);
+	pthread_mutex_unlock(&dongle->mutex);
+	if (acquired)
+		log_state(coder, "has taken a dongle");
+	return (acquired);
+}
+
 int	take_one_dongle(t_coder *coder, t_dongle *dongle)
 {
 	t_request	request;
-	int			acquired;
 
 	request.coder = coder;
 	request.deadline = coder_deadline(coder);
@@ -66,17 +85,5 @@ int	take_one_dongle(t_coder *coder, t_dongle *dongle)
 		return (0);
 	}
 	wait_for_request(coder, dongle, &request);
-	acquired = !simulation_stopped(coder->simulation);
-	if (acquired)
-	{
-		heap_pop(&dongle->queue);
-		dongle->owner_id = coder->id;
-	}
-	else
-		heap_remove(&dongle->queue, &request);
-	pthread_cond_broadcast(&dongle->condition);
-	pthread_mutex_unlock(&dongle->mutex);
-	if (acquired)
-		log_state(coder, "has taken a dongle");
-	return (acquired);
+	return (finish_request(coder, dongle, &request));
 }

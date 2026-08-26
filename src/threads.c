@@ -40,6 +40,16 @@ static void	one_coder(t_coder *coder)
 	release_dongle(coder, coder->left_dongle);
 }
 
+static void	debug_and_refactor(t_coder *coder)
+{
+	log_state(coder, "is debugging");
+	simulation_sleep(coder->simulation,
+		coder->simulation->config.t_debug);
+	log_state(coder, "is refactoring");
+	simulation_sleep(coder->simulation,
+		coder->simulation->config.t_refactor);
+}
+
 void	*coder_routine(void *data)
 {
 	t_coder	*coder;
@@ -57,12 +67,7 @@ void	*coder_routine(void *data)
 	{
 		if (!compile_code(coder))
 			break ;
-		log_state(coder, "is debugging");
-		simulation_sleep(coder->simulation,
-			coder->simulation->config.t_debug);
-		log_state(coder, "is refactoring");
-		simulation_sleep(coder->simulation,
-			coder->simulation->config.t_refactor);
+		debug_and_refactor(coder);
 	}
 	return (NULL);
 }
