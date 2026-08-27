@@ -31,13 +31,14 @@ void	sleep_ms(long duration)
 		usleep(500);
 }
 
-void	simulation_sleep(t_simulation *simulation, long duration)
+int	simulation_sleep(t_simulation *simulation, long duration)
 {
 	long	end;
 
 	end = current_time_ms() + duration;
 	while (current_time_ms() < end && !simulation_stopped(simulation))
 		usleep(500);
+	return (!simulation_stopped(simulation));
 }
 
 void	ms_to_timespec(long milliseconds, struct timespec *time)

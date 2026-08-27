@@ -15,20 +15,25 @@
 
 static int	compile_code(t_coder *coder)
 {
+	int	completed;
+
 	if (!take_dongles(coder))
 		return (0);
 	pthread_mutex_lock(&coder->state_mutex);
 	coder->last_compile_ms = current_time_ms();
 	pthread_mutex_unlock(&coder->state_mutex);
 	log_state(coder, "is compiling");
-	simulation_sleep(coder->simulation,
+	completed = simulation_sleep(coder->simulation,
 		coder->simulation->config.t_compile);
-	pthread_mutex_lock(&coder->state_mutex);
-	coder->compile_count++;
-	pthread_mutex_unlock(&coder->state_mutex);
+	if (completed)
+	{
+		pthread_mutex_lock(&coder->state_mutex);
+		coder->compile_count++;
+		pthread_mutex_unlock(&coder->state_mutex);
+	}
 	release_dongle(coder, coder->left_dongle);
 	release_dongle(coder, coder->right_dongle);
-	return (1);
+	return (completed);
 }
 
 static void	one_coder(t_coder *coder)

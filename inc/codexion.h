@@ -34,7 +34,7 @@ int		take_one_dongle(t_coder *coder, t_dongle *dongle);
 void	release_dongle(t_coder *coder, t_dongle *dongle);
 long	current_time_ms(void);
 void	sleep_ms(long duration);
-void	simulation_sleep(t_simulation *simulation, long duration);
+int		simulation_sleep(t_simulation *simulation, long duration);
 void	ms_to_timespec(long milliseconds, struct timespec *time);
 
 #endif
