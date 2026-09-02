@@ -22,15 +22,6 @@ long	current_time_ms(void)
 	return (time.tv_sec * 1000L + time.tv_usec / 1000L);
 }
 
-void	sleep_ms(long duration)
-{
-	long	end;
-
-	end = current_time_ms() + duration;
-	while (current_time_ms() < end)
-		usleep(500);
-}
-
 int	simulation_sleep(t_simulation *simulation, long duration)
 {
 	long	end;
