@@ -24,7 +24,7 @@ static int	compile_code(t_coder *coder)
 	pthread_mutex_unlock(&coder->state_mutex);
 	log_state(coder, "is compiling");
 	completed = simulation_sleep(coder->simulation,
-		coder->simulation->config.t_compile);
+			coder->simulation->config.t_compile);
 	if (completed)
 	{
 		pthread_mutex_lock(&coder->state_mutex);

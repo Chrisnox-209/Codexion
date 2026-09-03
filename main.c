@@ -15,7 +15,7 @@
 
 int	main(int argc, char **argv)
 {
-	t_config	config;
+	t_config		config;
 	t_simulation	simulation;
 
 	if (argc != 9)
