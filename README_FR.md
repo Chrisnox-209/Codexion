@@ -111,17 +111,12 @@ mutex d'état de ce codeur est verrouillé.
 
 ## Ressources
 
-- documentation sur la programmation avec les threads POSIX ;
-- pages de manuel `pthread_create(3)` et `pthread_join(3)` ;
-- page de manuel `pthread_mutex_lock(3)` ;
-- pages de manuel `pthread_cond_wait(3)` et `pthread_cond_timedwait(3)` ;
-- page de manuel `gettimeofday(2)` ;
-- conditions de Coffman pour les interblocages ;
-- documentation sur les tas binaires et les files de priorité.
+- [Documentation sur la programmation des threads POSIX](https://man7.org/linux/man-pages/man7/pthreads.7.html)
+- Pages de manuel [`pthread_create(3)`](https://man7.org/linux/man-pages/man3/pthread_create.3.html) et [`pthread_join(3)`](https://man7.org/linux/man-pages/man3/pthread_join.3.html)
+- Page de manuel [`pthread_mutex_lock(3)`](https://man7.org/linux/man-pages/man3/pthread_mutex_lock.3p.html)
+- Pages de manuel [`pthread_cond_wait(3)`](https://man7.org/linux/man-pages/man3/pthread_cond_wait.3p.html) et [`pthread_cond_timedwait(3)`](https://man7.org/linux/man-pages/man3/pthread_cond_timedwait.3p.html)
+- Page de manuel [`gettimeofday(2)`](https://man7.org/linux/man-pages/man2/gettimeofday.2.html)
+- [Conditions de Coffman pour les interblocages](https://en.wikipedia.org/wiki/Deadlock#Necessary_conditions)
+- [Documentation sur les tas binaires et les files de priorité](https://en.wikipedia.org/wiki/Binary_heap)
 
-L'IA a été utilisée pour relire le sujet, diviser l'implémentation en petites
-étapes, suggérer des cas de test pour la concurrence et vérifier les cas
-limites liés à la synchronisation. Les suggestions générées ont été comparées
-au sujet, compilées avec les options obligatoires et testées avec
-ThreadSanitizer. L'implémentation finale et ses choix de conception doivent
-être compris et pouvoir être expliqués par l'auteur.
+L'IA a été utilisée pour traduire le sujet du projet, générer des cas de test de concurrence et rédiger ce README. Les suggestions et les tests générés ont été vérifiés par rapport aux exigences du sujet d'origine, compilés avec les flags obligatoires et testés avec ThreadSanitizer. L'implémentation finale ainsi que ses choix de conception doivent être compris et défendus par l'auteur.

@@ -103,16 +103,15 @@ while the coder state mutex is locked.
 
 ## Resources
 
-- POSIX Threads Programming documentation
-- `pthread_create(3)` and `pthread_join(3)` manual pages
-- `pthread_mutex_lock(3)` manual page
-- `pthread_cond_wait(3)` and `pthread_cond_timedwait(3)` manual pages
-- `gettimeofday(2)` manual page
-- Coffman conditions for deadlocks
-- Binary heap and priority queue documentation
+- [POSIX Threads Programming documentation](https://man7.org/linux/man-pages/man7/pthreads.7.html)
+- [`pthread_create(3)`](https://man7.org/linux/man-pages/man3/pthread_create.3.html) and [`pthread_join(3)`](https://man7.org/linux/man-pages/man3/pthread_join.3.html) manual pages
+- [`pthread_mutex_lock(3)`](https://man7.org/linux/man-pages/man3/pthread_mutex_lock.3p.html) manual page
+- [`pthread_cond_wait(3)`](https://man7.org/linux/man-pages/man3/pthread_cond_wait.3p.html) and [`pthread_cond_timedwait(3)`](https://man7.org/linux/man-pages/man3/pthread_cond_timedwait.3p.html) manual pages
+- [`gettimeofday(2)`](https://man7.org/linux/man-pages/man2/gettimeofday.2.html) manual page
+- [Coffman conditions for deadlocks](https://en.wikipedia.org/wiki/Deadlock#Necessary_conditions)
+- [Binary heap and priority queue documentation](https://en.wikipedia.org/wiki/Binary_heap)
 
-AI was used to review the subject, divide the implementation into small
-steps, suggest concurrency test cases and check synchronization edge cases.
-The generated suggestions were reviewed against the subject, compiled with the
-mandatory flags and tested with ThreadSanitizer. The final implementation and
-its design choices must be understood and defended by the author.
+AI was used to translate the project subject, generate concurrency test cases, and write this README.
+The generated suggestions and tests were reviewed against the original subject requirements, compiled with the
+mandatory flags, and tested with ThreadSanitizer. The final implementation and its design choices must be 
+understood and defended by the author.
