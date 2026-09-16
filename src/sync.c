@@ -43,6 +43,9 @@ void	wake_all_dongles(t_simulation *simulation)
 		pthread_mutex_unlock(&simulation->dongles[index].mutex);
 		index++;
 	}
+	pthread_mutex_lock(&simulation->pair_mutex);
+	pthread_cond_broadcast(&simulation->pair_condition);
+	pthread_mutex_unlock(&simulation->pair_mutex);
 }
 
 void	log_state(t_coder *coder, char *message)

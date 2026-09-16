@@ -42,18 +42,18 @@ The available Makefile rules are `all`, `clean`, `fclean` and `re`.
 
 ## Scheduling policies
 
-Each dongle owns a priority heap containing the pending requests.
+Pair requests are stored in a priority heap shared by the simulation.
 
 - FIFO gives priority to the request that arrived first.
 - EDF gives priority to the coder with the nearest burnout deadline.
-- Equal EDF deadlines are resolved by arrival order, then by coder ID.
+- Equal EDF deadlines are resolved in favor of the higher coder ID.
 
 ## Blocking cases handled
 
 ### Deadlock prevention
 
-Coders request their two dongles in increasing dongle ID order. Every coder
-therefore follows the same locking order, which removes the circular-wait
+Both dongles are reserved atomically by the pair scheduler. A coder never holds
+one dongle while waiting for the other, which removes the hold-and-wait
 condition required for a deadlock.
 
 ### Starvation prevention
@@ -88,17 +88,17 @@ second one and eventually burns out.
 
 The project uses the following POSIX synchronization primitives:
 
-- one mutex per dongle protects its owner, cooldown and request heap;
-- one condition variable per dongle puts waiting coders to sleep;
+- one mutex per dongle protects its owner and cooldown;
+- one mutex, condition variable and priority heap arbitrate pair requests;
 - one mutex per coder protects the last compile time and compile counter;
 - one output mutex prevents log lines from being mixed;
 - one stop mutex protects the global end state;
 - condition broadcasts wake waiting threads when a dongle is released or the
   simulation stops.
 
-For example, a coder inserts a request while the dongle mutex is locked. It
-then waits on the dongle condition. After waking up, it checks the heap, owner
-and cooldown again before taking the dongle. The monitor reads coder state only
+For example, a coder inserts one pair request while the pair mutex is locked.
+After waking up, it checks the priority heap, both owners and both cooldowns
+before atomically reserving the dongles. The monitor reads coder state only
 while the coder state mutex is locked.
 
 ## Resources

@@ -66,6 +66,10 @@ struct s_simulation
 	pthread_t		monitor;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	stop_mutex;
+	pthread_mutex_t	pair_mutex;
+	pthread_cond_t	pair_condition;
+	t_heap			pair_queue;
+	long			next_pair_order;
 	int				stopped;
 	long			start_ms;
 };

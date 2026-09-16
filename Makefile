@@ -14,6 +14,7 @@ SOURCES = main.c \
 		  src/heap_remove.c \
 		  src/init.c \
 		  src/monitor.c \
+		  src/pair.c \
 		  src/parse.c \
 		  src/run.c \
 		  src/sync.c \

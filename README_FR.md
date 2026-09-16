@@ -44,20 +44,21 @@ Les règles disponibles dans le Makefile sont `all`, `clean`, `fclean` et `re`.
 
 ## Politiques d'ordonnancement
 
-Chaque dongle possède un tas de priorité contenant les requêtes en attente.
+Les demandes de paires sont stockées dans un tas de priorité partagé par la
+simulation.
 
 - FIFO donne la priorité à la requête arrivée en premier.
 - EDF donne la priorité au codeur dont l'échéance de burnout est la plus proche.
-- Lorsque plusieurs échéances EDF sont égales, elles sont départagées par
-  l'ordre d'arrivée, puis par l'identifiant du codeur.
+- Lorsque plusieurs échéances EDF sont égales, le codeur dont l'identifiant
+  est le plus élevé est prioritaire.
 
 ## Cas de blocage pris en charge
 
 ### Prévention des interblocages
 
-Les codeurs demandent leurs deux dongles dans l'ordre croissant de leur
-identifiant. Tous les codeurs suivent donc le même ordre de verrouillage, ce
-qui supprime la condition d'attente circulaire nécessaire à un interblocage.
+Les deux dongles sont réservés atomiquement par l'ordonnanceur de paires. Un
+codeur ne conserve donc jamais un dongle en attendant le second, ce qui
+supprime la condition de possession et d'attente nécessaire à un interblocage.
 
 ### Prévention de la famine
 
@@ -93,9 +94,9 @@ pas en obtenir un second et finit par faire un burnout.
 
 Le projet utilise les mécanismes de synchronisation POSIX suivants :
 
-- un mutex par dongle protège son propriétaire, son temps de refroidissement
-  et son tas de requêtes ;
-- une variable de condition par dongle met les codeurs en attente en sommeil ;
+- un mutex par dongle protège son propriétaire et son temps de refroidissement ;
+- un mutex, une variable de condition et un tas de priorité arbitrent les
+  demandes de paires ;
 - un mutex par codeur protège l'heure de sa dernière compilation et son
   compteur de compilations ;
 - un mutex de sortie empêche le mélange des lignes de logs ;
@@ -103,10 +104,10 @@ Le projet utilise les mécanismes de synchronisation POSIX suivants :
 - des diffusions de condition réveillent les threads en attente lorsqu'un
   dongle est libéré ou lorsque la simulation s'arrête.
 
-Par exemple, un codeur insère une requête pendant que le mutex du dongle est
-verrouillé. Il attend ensuite sur la condition du dongle. Après son réveil, il
-vérifie de nouveau le tas, le propriétaire et le temps de refroidissement avant
-de prendre le dongle. Le moniteur lit l'état d'un codeur uniquement lorsque le
+Par exemple, un codeur insère une demande de paire pendant que le mutex des
+paires est verrouillé. Après son réveil, il vérifie le tas de priorité, les deux
+propriétaires et les deux temps de refroidissement avant de réserver les
+dongles atomiquement. Le moniteur lit l'état d'un codeur uniquement lorsque le
 mutex d'état de ce codeur est verrouillé.
 
 ## Ressources

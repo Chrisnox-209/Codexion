@@ -26,6 +26,8 @@ int	request_before(t_heap *heap, t_request *a, t_request *b)
 {
 	if (heap->is_edf && a->deadline != b->deadline)
 		return (a->deadline < b->deadline);
+	if (heap->is_edf && a->coder->id != b->coder->id)
+		return (a->coder->id > b->coder->id);
 	if (a->order != b->order)
 		return (a->order < b->order);
 	return (a->coder->id < b->coder->id);

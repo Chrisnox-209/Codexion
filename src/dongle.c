@@ -14,30 +14,16 @@
 
 void	release_dongle(t_coder *coder, t_dongle *dongle)
 {
+	t_simulation	*simulation;
+
+	simulation = coder->simulation;
 	pthread_mutex_lock(&dongle->mutex);
 	dongle->owner_id = 0;
 	dongle->available_at = current_time_ms()
-		+ coder->simulation->config.cooldown;
+		+ simulation->config.cooldown;
 	pthread_cond_broadcast(&dongle->condition);
 	pthread_mutex_unlock(&dongle->mutex);
-}
-
-int	take_dongles(t_coder *coder)
-{
-	t_dongle	*first;
-	t_dongle	*second;
-
-	first = coder->left_dongle;
-	second = coder->right_dongle;
-	if (first->id > second->id)
-	{
-		first = coder->right_dongle;
-		second = coder->left_dongle;
-	}
-	if (!take_one_dongle(coder, first))
-		return (0);
-	if (take_one_dongle(coder, second))
-		return (1);
-	release_dongle(coder, first);
-	return (0);
+	pthread_mutex_lock(&simulation->pair_mutex);
+	pthread_cond_broadcast(&simulation->pair_condition);
+	pthread_mutex_unlock(&simulation->pair_mutex);
 }

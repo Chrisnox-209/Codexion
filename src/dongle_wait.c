@@ -12,7 +12,7 @@
 
 #include "codexion.h"
 
-static long	coder_deadline(t_coder *coder)
+long	coder_deadline(t_coder *coder)
 {
 	long	deadline;
 

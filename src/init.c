@@ -32,12 +32,37 @@ static int	allocate_arrays(t_simulation *simulation)
 	return (0);
 }
 
+static int	init_pair_sync(t_simulation *simulation)
+{
+	if (pthread_mutex_init(&simulation->pair_mutex, NULL) != 0)
+		return (1);
+	if (pthread_cond_init(&simulation->pair_condition, NULL) != 0)
+	{
+		pthread_mutex_destroy(&simulation->pair_mutex);
+		return (1);
+	}
+	if (heap_init(&simulation->pair_queue, simulation->config.nb_coders,
+			simulation->config.is_edf) != 0)
+	{
+		pthread_cond_destroy(&simulation->pair_condition);
+		pthread_mutex_destroy(&simulation->pair_mutex);
+		return (1);
+	}
+	return (0);
+}
+
 static int	init_main_mutexes(t_simulation *simulation)
 {
 	if (pthread_mutex_init(&simulation->print_mutex, NULL) != 0)
 		return (1);
 	if (pthread_mutex_init(&simulation->stop_mutex, NULL) != 0)
 	{
+		pthread_mutex_destroy(&simulation->print_mutex);
+		return (1);
+	}
+	if (init_pair_sync(simulation) != 0)
+	{
+		pthread_mutex_destroy(&simulation->stop_mutex);
 		pthread_mutex_destroy(&simulation->print_mutex);
 		return (1);
 	}

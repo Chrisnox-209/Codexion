@@ -31,6 +31,9 @@ void	clear_initialization(t_simulation *simulation, int dongles_ready)
 {
 	if (dongles_ready)
 		destroy_dongles(simulation, simulation->config.nb_coders);
+	heap_destroy(&simulation->pair_queue);
+	pthread_cond_destroy(&simulation->pair_condition);
+	pthread_mutex_destroy(&simulation->pair_mutex);
 	pthread_mutex_destroy(&simulation->print_mutex);
 	pthread_mutex_destroy(&simulation->stop_mutex);
 	free(simulation->coders);
@@ -48,6 +51,9 @@ void	destroy_simulation(t_simulation *simulation)
 		i++;
 	}
 	destroy_dongles(simulation, simulation->config.nb_coders);
+	heap_destroy(&simulation->pair_queue);
+	pthread_cond_destroy(&simulation->pair_condition);
+	pthread_mutex_destroy(&simulation->pair_mutex);
 	pthread_mutex_destroy(&simulation->print_mutex);
 	pthread_mutex_destroy(&simulation->stop_mutex);
 	free(simulation->coders);

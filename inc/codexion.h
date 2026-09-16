@@ -29,6 +29,7 @@ void	stop_simulation(t_simulation *simulation);
 void	wake_all_dongles(t_simulation *simulation);
 void	log_state(t_coder *coder, char *message);
 void	log_burnout(t_coder *coder);
+long	coder_deadline(t_coder *coder);
 int		take_dongles(t_coder *coder);
 int		take_one_dongle(t_coder *coder, t_dongle *dongle);
 void	release_dongle(t_coder *coder, t_dongle *dongle);
