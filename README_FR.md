@@ -107,8 +107,10 @@ Le projet utilise les mécanismes de synchronisation POSIX suivants :
 Par exemple, un codeur insère une demande de paire pendant que le mutex des
 paires est verrouillé. Après son réveil, il vérifie le tas de priorité, les deux
 propriétaires et les deux temps de refroidissement avant de réserver les
-dongles atomiquement. Le moniteur lit l'état d'un codeur uniquement lorsque le
-mutex d'état de ce codeur est verrouillé.
+dongles atomiquement. Les attributions sont légèrement décalées lorsqu'un
+refroidissement est actif afin que tous les dongles ne refroidissent pas au
+même instant. Le moniteur lit l'état d'un codeur uniquement lorsque le mutex
+d'état de ce codeur est verrouillé.
 
 ## Ressources
 

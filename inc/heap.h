@@ -22,5 +22,7 @@ t_request	*heap_peek(t_heap *heap);
 t_request	*heap_pop(t_heap *heap);
 void		heap_remove(t_heap *heap, t_request *request);
 int			request_before(t_heap *heap, t_request *a, t_request *b);
+int			requests_conflict(t_request *a, t_request *b);
+int			request_aged(t_simulation *simulation, t_request *request);
 
 #endif

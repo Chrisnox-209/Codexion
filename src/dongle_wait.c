@@ -77,6 +77,7 @@ int	take_one_dongle(t_coder *coder, t_dongle *dongle)
 
 	request.coder = coder;
 	request.deadline = coder_deadline(coder);
+	request.wait_started_ms = current_time_ms();
 	pthread_mutex_lock(&dongle->mutex);
 	request.order = dongle->next_order++;
 	if (heap_push(&dongle->queue, &request))

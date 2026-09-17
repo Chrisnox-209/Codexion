@@ -98,8 +98,10 @@ The project uses the following POSIX synchronization primitives:
 
 For example, a coder inserts one pair request while the pair mutex is locked.
 After waking up, it checks the priority heap, both owners and both cooldowns
-before atomically reserving the dongles. The monitor reads coder state only
-while the coder state mutex is locked.
+before atomically reserving the dongles. Pair grants are slightly staggered
+when cooldown is active so that all dongles do not repeatedly enter cooldown
+at the same instant. The monitor reads coder state only while the coder state
+mutex is locked.
 
 ## Resources
 

@@ -18,6 +18,8 @@ static int	pair_available(t_coder *coder)
 	t_dongle	*second;
 	int			available;
 
+	if (current_time_ms() < coder->simulation->next_pair_at)
+		return (0);
 	first = coder->left_dongle;
 	second = coder->right_dongle;
 	if (first->id > second->id)
@@ -46,7 +48,10 @@ static int	request_selected(t_simulation *simulation, t_request *request)
 	{
 		if (request_before(&simulation->pair_queue,
 				simulation->pair_queue.items[index], request)
-			&& pair_available(simulation->pair_queue.items[index]->coder))
+			&& requests_conflict(simulation->pair_queue.items[index], request)
+			&& (pair_available(simulation->pair_queue.items[index]->coder)
+				|| request_aged(simulation,
+					simulation->pair_queue.items[index])))
 			return (0);
 		index++;
 	}
@@ -57,6 +62,7 @@ static void	own_pair(t_coder *coder)
 {
 	t_dongle	*first;
 	t_dongle	*second;
+	long		delay;
 
 	first = coder->left_dongle;
 	second = coder->right_dongle;
@@ -71,6 +77,12 @@ static void	own_pair(t_coder *coder)
 	second->owner_id = coder->id;
 	pthread_mutex_unlock(&second->mutex);
 	pthread_mutex_unlock(&first->mutex);
+	delay = coder->simulation->config.cooldown;
+	if (coder->simulation->config.nb_coders > 32)
+		delay = 0;
+	if (delay > coder->simulation->config.t_compile)
+		delay = coder->simulation->config.t_compile;
+	coder->simulation->next_pair_at = current_time_ms() + delay;
 }
 
 static int	wait_for_pair(t_simulation *simulation, t_request *request)
@@ -100,6 +112,7 @@ int	take_dongles(t_coder *coder)
 	simulation = coder->simulation;
 	request.coder = coder;
 	request.deadline = coder_deadline(coder);
+	request.wait_started_ms = current_time_ms();
 	pthread_mutex_lock(&simulation->pair_mutex);
 	request.order = simulation->next_pair_order++;
 	if (heap_push(&simulation->pair_queue, &request))

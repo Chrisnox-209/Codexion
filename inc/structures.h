@@ -25,6 +25,7 @@ typedef struct s_request
 	t_coder	*coder;
 	long	order;
 	long	deadline;
+	long	wait_started_ms;
 }						t_request;
 
 typedef struct s_heap
@@ -70,6 +71,7 @@ struct s_simulation
 	pthread_cond_t	pair_condition;
 	t_heap			pair_queue;
 	long			next_pair_order;
+	long			next_pair_at;
 	int				stopped;
 	long			start_ms;
 };
