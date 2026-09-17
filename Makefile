@@ -17,6 +17,7 @@ SOURCES = main.c \
 		  src/pair.c \
 		  src/parse.c \
 		  src/run.c \
+		  src/request.c \
 		  src/sync.c \
 		  src/threads.c \
 		  src/time.c
